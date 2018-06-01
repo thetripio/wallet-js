@@ -10,8 +10,8 @@
 * currency
 
 ## Methods
-* generate([currency]): wallet
-* import(key [, type] [, currency]): wallet
+* generate([currency]): Wallet
+* import(key [, type] [, currency]): Wallet
     * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
     * key: string
     * currency: string
@@ -21,5 +21,5 @@
 * getTransaction(transactionHash): Promise
 * getTransactions(addressHexString): Promise
 * sendTransaction(transactionObject): Promise
-* private encodeAbi(methodName, paramsName[], paramsValue[]): string
-* private signTx(transactionObject): string
+* _encodeAbi(methodName, paramsName[], paramsValue[]): string
+* _signTx(transactionObject): string

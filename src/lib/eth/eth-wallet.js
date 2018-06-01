@@ -2,8 +2,6 @@ import Wallet from 'ethereumjs-wallet';
 import ethUtil from 'ethereumjs-util';
 import Web3 from 'web3';
 import eip20 from './eth-eip-20';
-import { resolve } from 'dns';
-import { rejects } from 'assert';
 
 let web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'));
 
@@ -18,7 +16,6 @@ export default class EthWallet {
         this.privateKey = wallet.getPrivateKeyString();
         this.publicKey = wallet.getPublicKeyString();
         this.address = wallet.getAddressString();
-        
     }
 
     import(key, type) {
@@ -80,6 +77,10 @@ export default class EthWallet {
     }
 
     getTransactions(addressHexString) {
+
+    }
+
+    sendTransaction(transactionObject) {
 
     }
 

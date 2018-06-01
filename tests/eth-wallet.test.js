@@ -1,4 +1,4 @@
-import EthWallet from '../src/lib/eth-wallet';
+import EthWallet from '../src/lib/eth/eth-wallet';
 import ethUtil from 'ethereumjs-util';
 import secp256k1 from 'secp256k1';
 
