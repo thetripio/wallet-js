@@ -44,14 +44,6 @@ export default class EthWallet {
         this.address = wallet.getAddressString();
     }
 
-    _encodeAbi() {
-
-    }
-
-    _signTx() {
-
-    }
-
     setProvider(host) {
         web3.setProvider(new Web3.providers.HttpProvider(host));
     }
@@ -121,6 +113,14 @@ export default class EthWallet {
 
     sendTransaction(transactionObject) {
         
+    }
+
+    _encodeAbi() {
+
+    }
+
+    _signTx() {
+
     }
 
     test() {

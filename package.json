@@ -1,6 +1,19 @@
 {
     "name": "trip-wallet",
-    "version": "0.1.0",
+    "version": "0.1.1",
+    "description": "Trip wallet SDK for JavaScript",
+    "authors": [{
+        "name": "Jay",
+        "email": "lijiakof@gmail.com",
+        "url": "https://github.com/lijiakof/"
+    }],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/thetripio/wallet-js.git"
+    },
+    "keywords": [
+        "blockchain", "eth", "btc", "trip", "tripio", "trio", "wallet"
+    ],
     "dependencies": {
         "ethereumjs-wallet": "^0.6.0",
         "web3": "0.19.0"
@@ -8,10 +21,6 @@
     "scripts": {
         "test": "jest",
         "coverage": "jest --coverage"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/thetripio/wallet-js.git"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",
