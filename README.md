@@ -18,7 +18,6 @@
 * getBalance(addressHexString): Promise
 * getTokenBalance(addressHexString, contractAddress): Promise
 * getTransaction(transactionHash): Promise
-* getTransactions(addressHexString): Promise
 * sendTransaction(transactionObject): Promise
 * _encodeAbi(methodName, paramsName[], paramsValue[]): string
 * _signTx(transactionObject): string

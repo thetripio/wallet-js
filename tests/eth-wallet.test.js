@@ -32,8 +32,6 @@ describe('import wallet', () => {
 });
 
 describe('transaction', () => {
-    wallet.test();
-
     test('getBalance', async () => {
         let balance = await wallet.getBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3');
 
