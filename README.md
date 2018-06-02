@@ -1,5 +1,4 @@
-# Trip Wallet for JavaScript SDK
-
+# Trip Wallet SDK for JavaScript
 
 ## API
 
