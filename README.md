@@ -1,14 +1,43 @@
 # Trip Wallet SDK for JavaScript
 
+## Install
+
+```
+yarn add trip-wallet
+Or
+npm install trip-wallet
+```
+
+## Usage
+
+```
+import Wallet from 'trip-wallet';
+
+let wallet = Wallet('eth');
+wallet.generate();
+wallet.setProvider('http://host:port');
+
+// async/await
+let balance = await wallet.getBalance(wallet.address);
+
+// Promise
+wallet.getBalance(wallet.address).then(res => {
+    balance = res;
+}, err => {
+
+});
+
+```
+
 ## API
 
-## Attributes
+### Attributes
 * privateKey
 * publicKey
 * address
 * currency
 
-## Methods
+### Methods
 * generate([currency]): Wallet
 * import(key [, type] [, currency]): Wallet
     * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'

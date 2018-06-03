@@ -31,48 +31,50 @@ describe('import wallet', () => {
     });
 });
 
-describe('transaction', () => {
-    test('getBalance', async () => {
-        let balance = await wallet.getBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3');
-
-        console.log(balance.toNumber());
-       
-    }, 30000);
-
-    test('getTokenBalance', async () => {
-        let balance = await wallet.getTokenBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3', '0xF142f1c7BaDc95FB438302D7Cf0a5Db426f8f779');
-
-        console.log(balance.toNumber());
-
-    }, 30000);
-
-    // test('getTransaction', async () => {
-    //     let tx = await wallet.getTransaction('')
-
-    // }, 3000);
-
-});
-
-// describe('main transaction', () => {
-//     wallet.setProvider('https://mainnet.infura.io/9WfBzi6QFGrAWBYZKq57');
-
+// describe('transaction', () => {
 //     test('getBalance', async () => {
-//         let balance = await wallet.getBalance('0xb02d5da39628918daa9545388f1abb60be368e0a');
+//         let balance = await wallet.getBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3');
 
 //         console.log(balance.toNumber());
-//     }, 10000);
+       
+//     }, 30000);
 
 //     test('getTokenBalance', async () => {
-//         let balance = await wallet.getTokenBalance('0xb02d5da39628918daa9545388f1abb60be368e0a', '0x8b40761142b9aa6dc8964e61d0585995425c3d94')
+//         let balance = await wallet.getTokenBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3', '0xF142f1c7BaDc95FB438302D7Cf0a5Db426f8f779');
 
 //         console.log(balance.toNumber());
-//     }, 10000);
+
+//     }, 30000);
 
 //     test('getTransaction', async () => {
-//         let tx = await wallet.getTransaction('0xec3caf5731d6b9724ff5278bd9482bfeb58e3d1f44b199c7ce99b4e07def83cf');
+//         let tx = await wallet.getTransaction('')
 
-//         console.log(tx);
-//     }, 10000);
-    
+//     }, 3000);
+
 // });
+
+describe('main transaction', () => {
+    // wallet.setProvider('https://mainnet.infura.io/9WfBzi6QFGrAWBYZKq57');
+    wallet.setProvider('http://35.200.87.13:8545');
+
+    test('getBalance', async () => {
+        let balance = await wallet.getBalance('0xb02d5da39628918daa9545388f1abb60be368e0a');
+
+        console.log(balance.toNumber());
+    }, 10000);
+
+    test('getTokenBalance', async () => {
+        let balance = await wallet.getTokenBalance('0xb02d5da39628918daa9545388f1abb60be368e0a', '0x8b40761142b9aa6dc8964e61d0585995425c3d94')
+
+        console.log(balance.toNumber());
+    }, 10000);
+
+    test('getTransaction', async () => {
+        let tx = await wallet.getTransaction('0xec3caf5731d6b9724ff5278bd9482bfeb58e3d1f44b199c7ce99b4e07def83cf');
+
+        expect('0xec3caf5731d6b9724ff5278bd9482bfeb58e3d1f44b199c7ce99b4e07def83cf').toBe(tx.hash);
+        expect('0xb02d5da39628918daa9545388f1abb60be368e0a').toBe(tx.from);
+    }, 10000);
+    
+});
 

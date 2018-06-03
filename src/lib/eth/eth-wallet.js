@@ -66,6 +66,10 @@ export default class EthWallet {
         });
     }
 
+    getTrio() {
+        
+    }
+
     /**
      * get token balance
      * @param { String } addressHexString 
