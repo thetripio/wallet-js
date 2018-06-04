@@ -46,16 +46,16 @@ describe('import wallet', () => {
 
 //     }, 30000);
 
-//     test('getTransaction', async () => {
-//         let tx = await wallet.getTransaction('')
+//     // test('getTransaction', async () => {
+//     //     let tx = await wallet.getTransaction('')
 
-//     }, 3000);
+//     // }, 3000);
 
 // });
 
 describe('main transaction', () => {
-    // wallet.setProvider('https://mainnet.infura.io/9WfBzi6QFGrAWBYZKq57');
-    wallet.setProvider('http://35.200.87.13:8545');
+     wallet.setProvider('https://mainnet.infura.io/9WfBzi6QFGrAWBYZKq57');
+    //wallet.setProvider('http://35.200.87.13:8545');
 
     test('getBalance', async () => {
         let balance = await wallet.getBalance('0xb02d5da39628918daa9545388f1abb60be368e0a');
