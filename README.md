@@ -36,10 +36,22 @@ wallet.getBalance(wallet.address).then(res => {
 * publicKey
 * address
 * currency
+* transactionObject
+    * [contract]
+    * [methodName]
+    * [arguments]
+    * [privateKey]
+    * from
+    * [to]
+    * [value]
+    * [gas]
+    * [gasPrice]
+    * [data]
+    * [none]
 
 ### Methods
-* generate([currency]): Wallet
-* import(key [, type] [, currency]): Wallet
+* generate([currency]): Object
+* import(key [, type] [, currency]): Object
     * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
     * key: string
     * currency: string
@@ -47,6 +59,5 @@ wallet.getBalance(wallet.address).then(res => {
 * getBalance(addressHexString): Promise
 * getTokenBalance(addressHexString, contractAddress): Promise
 * getTransaction(transactionHash): Promise
+* contract(abi, address): Object
 * sendTransaction(transactionObject): Promise
-* _encodeAbi(methodName, paramsName[], paramsValue[]): string
-* _signTx(transactionObject): string
