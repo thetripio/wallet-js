@@ -61,3 +61,5 @@ wallet.getBalance(wallet.address).then(res => {
 * getTransaction(transactionHash): Promise
 * contract(abi, address): Object
 * sendTransaction(transactionObject): Promise
+* toWei(num, unit)
+* fromWei(num, unit)

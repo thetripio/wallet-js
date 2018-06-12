@@ -52,7 +52,7 @@ describe('transaction', () => {
     test('getTransaction', async () => {
         let tx = await wallet.getTransaction('0x15bedb614812a187fa0128e7473d64c106f8c9dc1e71fbb72422df4fc49840b4')
 
-        //console.log(tx);
+        console.log(tx);
     }, 30000);
 
     test('sendTransaction contract', async () => {
@@ -71,27 +71,25 @@ describe('transaction', () => {
             //data: '',
             nonce: null
         });
-
-        console.log('tx');
         console.log(tx);
 
     }, 30000);
 
-    test('sendTransaction', async () => {
+    // test('sendTransaction', async () => {
         
-        let tx = await wallet.sendTransaction({
-            from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-            to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
-            value: 1000000000000000000,
-            gas: 22000,
-            gasPrice: 1000000000,
-            //data: '',
-            //nonce: 12,
-            privateKey: '0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65'
-        });
+    //     let tx = await wallet.sendTransaction({
+    //         from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
+    //         to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+    //         value: 1000000000000000000,
+    //         gasLimit: 22000,
+    //         gasPrice: 1000000000,
+    //         //data: '',
+    //         //nonce: 12,
+    //         privateKey: '0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65'
+    //     });
 
-        console.log(tx);
-    });
+    //     console.log(tx);
+    // });
 
  });
 

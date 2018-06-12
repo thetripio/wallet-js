@@ -46,8 +46,21 @@ export default class EthWallet {
         this.address = wallet.getAddressString();
     }
 
+    /**
+     * set provider
+     * @param { String } host 
+     * @param { Number } timeout 
+     */
     setProvider(host, timeout) {
         web3.setProvider(new Web3.providers.HttpProvider(host, timeout));
+    }
+
+    toWei(num, unit) {
+        return web3.toWei(num, unit);
+    }
+
+    fromWei(num, unit) {
+        return web3.fromWei(num, unit)
     }
 
     /**
@@ -103,54 +116,44 @@ export default class EthWallet {
      * @return { Promise }
      */
     getTransaction(transactionHash) {
-        
-        return new Promise((resolve, reject) => {
-            web3.eth.getTransaction(transactionHash, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(res);
-                }
-            });
-        });
 
-        /** TODO:
         return new Promise((resolve, reject) => {
-            web3.eth.getTransactionReceipt(transactionHash, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                else if(res) {
-                    resolve(res);
-                }
-                else if(!res) {
-                    web3.eth.getTransaction(transactionHash, (err, res) => {
-                        if (err) {
-                            reject(err);
+            web3.eth.getTransaction(transactionHash, (txErr, txRes) => {
+
+                web3.eth.getTransactionReceipt(transactionHash, (recErr, recRes) => {
+                    if (txErr && recErr) {
+                        reject(txErr + recErr);
+                    }
+                    else {
+                        let tx = {};
+
+                        if (txRes && recRes) {
+                            tx = this._mergeTransaction(txRes, recRes);
                         }
                         else {
-                            resolve(res);
+                            tx = txRes || recRes;
                         }
-                    });
-                }
+
+                        resolve(tx);
+                    }
+                });
             });
         });
-        **/
     }
 
-    // TODO: merge to getTransaction
-    getTransactionReceipt(transactionHash) {
-        return new Promise((resolve, reject) => {
-            web3.eth.getTransactionReceipt(transactionHash, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(res);
-                }
-            });
-        });
+    _mergeTransaction(transaction, receipt) {
+
+        let tx = {};
+
+        for (let key in transaction) {
+            tx[key] = transaction[key];
+        }
+
+        for (let key in receipt) {
+            tx[key] = tx[key] || receipt[key];
+        }
+
+        return tx;
     }
 
     getTransactions(addressHexString) {
@@ -168,50 +171,40 @@ export default class EthWallet {
 
         return contract.at(address);
     }
+    /**
+     * get trasaction gasLimit
+     * @param { Object } transactionObject 
+     */
+    estimateGas(transactionObject) {
+        return new Promise((resolve, reject) => {
+            web3.eth.estimateGas(transactionObject, (err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(res);
+                }
+            })
+        });
+    }
 
     /**
      * send transaction
      * @param { Object } transactionObject
      */
     sendTransaction(transactionObject) {
-        return new Promise((resolve, reject) => {
-
-            if (!transactionObject.nonce) {
-                web3.eth.getTransactionCount(transactionObject.from, (err, res) => {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    }
-                    else {
-                        transactionObject.nonce = res;
-                        this._sendTransaction(transactionObject, (err, res) => {
-                            if (err) {
-                                console.log(err);
-                                reject(err);
-                            }
-                            else {
-                                resolve(res);
-                            }
-
-                        });
-                    }
-                });
-            }
-            else {
-                this._sendTransaction(transactionObject, (err, res) => {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    }
-                    else {
-                        resolve(res);
-                    }
-                });
-            }
-        });
+        if (!transactionObject.nonce && transactionObject.nonce !== 0) {
+            return this._getTransactionCount(transactionObject.from).then(res => {
+                transactionObject.nonce = res;
+                return this._sendTransaction(transactionObject);
+            });
+        }
+        else {
+            return this._sendTransaction(transactionObject);
+        }
     }
 
-    _sendTransaction(transactionObject, callback) {
+    _sendTransaction(transactionObject) {
         let txObj = {}, needSign = false, contractMethod;
 
         if (transactionObject.contract) {
@@ -223,7 +216,7 @@ export default class EthWallet {
                 from: transactionObject.from,
                 to: transactionObject.contract.address || transactionObject.to,
                 value: transactionObject.value,
-                gasLimit: transactionObject.gas,
+                gasLimit: transactionObject.gasLimit,
                 gasPrice: transactionObject.gasPrice,
                 data: this._encodeAbi(contractMethod, transactionObject.arguments),
                 nonce: transactionObject.nonce
@@ -236,26 +229,51 @@ export default class EthWallet {
                 from: transactionObject.from,
                 to: transactionObject.to,
                 value: transactionObject.value,
-                gasLimit: transactionObject.gas,
+                gasLimit: transactionObject.gasLimit,
                 gasPrice: transactionObject.gasPrice,
                 data: transactionObject.data || '0x',
                 nonce: transactionObject.nonce
             };
         }
 
-        if (needSign) {
+        return new Promise((resolve, reject) => {
+            if (needSign) {
+                let serialize = this._signTx(txObj, transactionObject.privateKey);
 
-            let serialize = this._signTx(txObj, transactionObject.privateKey);
+                web3.eth.sendRawTransaction(serialize, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(res);
+                    }
+                });
+            }
+            else {
+                web3.eth.call(txObj, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(this._decodeAbi(contractMethod, res));
+                    }
+                });
+            }
+        });
 
-            web3.eth.sendRawTransaction(serialize, callback);
-        }
-        else {
-            web3.eth.call(txObj, (err, res) => {
-                if(callback) {
-                    callback(err, this._decodeAbi(contractMethod, res));
+    }
+
+    _getTransactionCount(address) {
+        return new Promise((resolve, reject) => {
+            web3.eth.getTransactionCount(address, (err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(res);
                 }
             });
-        }
+        });
     }
 
     /**
@@ -333,10 +351,6 @@ export default class EthWallet {
         let serialize = tx.serialize();
 
         return serialize ? ('0x' + serialize.toString('hex')) : '';
-    }
-
-    toWei(num, unit) {
-        return web3.toWei(num, unit);
     }
 
     _test() {
