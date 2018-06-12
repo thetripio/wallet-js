@@ -3,7 +3,9 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var Wallet = _interopDefault(require('ethereumjs-wallet'));
-var ethUtil = _interopDefault(require('ethereumjs-util'));
+var EthUtil = _interopDefault(require('ethereumjs-util'));
+var Abi = _interopDefault(require('ethereumjs-abi'));
+var Transaction = _interopDefault(require('ethereumjs-tx'));
 var Web3 = _interopDefault(require('web3'));
 
 var eip20 = [{
@@ -181,7 +183,7 @@ var EthWallet = function () {
     }, {
         key: 'import',
         value: function _import(key, type) {
-            var priv = ethUtil.toBuffer(key);
+            var priv = EthUtil.toBuffer(key);
             this._importPrivateKey(priv);
         }
     }, {
@@ -193,10 +195,27 @@ var EthWallet = function () {
             this.publicKey = wallet.getPublicKeyString();
             this.address = wallet.getAddressString();
         }
+
+        /**
+         * set provider
+         * @param { String } host 
+         * @param { Number } timeout 
+         */
+
     }, {
         key: 'setProvider',
-        value: function setProvider(host) {
-            web3.setProvider(new Web3.providers.HttpProvider(host));
+        value: function setProvider(host, timeout) {
+            web3.setProvider(new Web3.providers.HttpProvider(host, timeout));
+        }
+    }, {
+        key: 'toWei',
+        value: function toWei(num, unit) {
+            return web3.toWei(num, unit);
+        }
+    }, {
+        key: 'fromWei',
+        value: function fromWei(num, unit) {
+            return web3.fromWei(num, unit);
         }
 
         /**
@@ -218,6 +237,11 @@ var EthWallet = function () {
                 });
             });
         }
+
+        /**
+         * 
+         */
+
     }, {
         key: 'getTrio',
         value: function getTrio() {}
@@ -255,8 +279,75 @@ var EthWallet = function () {
     }, {
         key: 'getTransaction',
         value: function getTransaction(transactionHash) {
+            var _this = this;
+
             return new Promise(function (resolve, reject) {
-                web3.eth.getTransaction(transactionHash, function (err, res) {
+                web3.eth.getTransaction(transactionHash, function (txErr, txRes) {
+
+                    web3.eth.getTransactionReceipt(transactionHash, function (recErr, recRes) {
+                        if (txErr && recErr) {
+                            reject(txErr + recErr);
+                        } else {
+                            var tx = {};
+
+                            if (txRes && recRes) {
+                                tx = _this._mergeTransaction(txRes, recRes);
+                            } else {
+                                tx = txRes || recRes;
+                            }
+
+                            resolve(tx);
+                        }
+                    });
+                });
+            });
+        }
+    }, {
+        key: '_mergeTransaction',
+        value: function _mergeTransaction(transaction, receipt) {
+
+            var tx = {};
+
+            for (var key in transaction) {
+                tx[key] = transaction[key];
+            }
+
+            for (var _key in receipt) {
+                tx[_key] = tx[_key] || receipt[_key];
+            }
+
+            return tx;
+        }
+    }, {
+        key: 'getTransactions',
+        value: function getTransactions(addressHexString) {
+            console.log('please try https://etherscan.io/apis');
+            //http://api.etherscan.io/api?module=account&action=txlist&address=0xb02d5da39628918daa9545388f1abb60be368e0a
+        }
+
+        /**
+         * create contract instance
+         * @param { Array } abi 
+         * @param { String } address 
+         */
+
+    }, {
+        key: 'contract',
+        value: function contract(abi, address) {
+            var contract = web3.eth.contract(abi);
+
+            return contract.at(address);
+        }
+        /**
+         * get trasaction gasLimit
+         * @param { Object } transactionObject 
+         */
+
+    }, {
+        key: 'estimateGas',
+        value: function estimateGas(transactionObject) {
+            return new Promise(function (resolve, reject) {
+                web3.eth.estimateGas(transactionObject, function (err, res) {
                     if (err) {
                         reject(err);
                     } else {
@@ -265,24 +356,190 @@ var EthWallet = function () {
                 });
             });
         }
-    }, {
-        key: 'getTransactions',
-        value: function getTransactions(addressHexString) {
-            console.log('please try https://etherscan.io/apis');
-            //http://api.etherscan.io/api?module=account&action=txlist&address=0xb02d5da39628918daa9545388f1abb60be368e0a
-        }
+
+        /**
+         * send transaction
+         * @param { Object } transactionObject
+         */
+
     }, {
         key: 'sendTransaction',
-        value: function sendTransaction(transactionObject) {}
+        value: function sendTransaction(transactionObject) {
+            var _this2 = this;
+
+            if (!transactionObject.nonce && transactionObject.nonce !== 0) {
+                return this._getTransactionCount(transactionObject.from).then(function (res) {
+                    transactionObject.nonce = res;
+                    return _this2._sendTransaction(transactionObject);
+                });
+            } else {
+                return this._sendTransaction(transactionObject);
+            }
+        }
+    }, {
+        key: '_sendTransaction',
+        value: function _sendTransaction(transactionObject) {
+            var _this3 = this;
+
+            var txObj = {},
+                needSign = false,
+                contractMethod = void 0;
+
+            if (transactionObject.contract) {
+                contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
+
+                needSign = !contractMethod.constant;
+
+                txObj = {
+                    from: transactionObject.from,
+                    to: transactionObject.contract.address || transactionObject.to,
+                    value: transactionObject.value,
+                    gasLimit: transactionObject.gasLimit,
+                    gasPrice: transactionObject.gasPrice,
+                    data: this._encodeAbi(contractMethod, transactionObject.arguments),
+                    nonce: transactionObject.nonce
+                };
+            } else {
+                needSign = true;
+
+                txObj = {
+                    from: transactionObject.from,
+                    to: transactionObject.to,
+                    value: transactionObject.value,
+                    gasLimit: transactionObject.gasLimit,
+                    gasPrice: transactionObject.gasPrice,
+                    data: transactionObject.data || '0x',
+                    nonce: transactionObject.nonce
+                };
+            }
+
+            return new Promise(function (resolve, reject) {
+                if (needSign) {
+                    var serialize = _this3._signTx(txObj, transactionObject.privateKey);
+
+                    web3.eth.sendRawTransaction(serialize, function (err, res) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(res);
+                        }
+                    });
+                } else {
+                    web3.eth.call(txObj, function (err, res) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(_this3._decodeAbi(contractMethod, res));
+                        }
+                    });
+                }
+            });
+        }
+    }, {
+        key: '_getTransactionCount',
+        value: function _getTransactionCount(address) {
+            return new Promise(function (resolve, reject) {
+                web3.eth.getTransactionCount(address, function (err, res) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+        }
+
+        /**
+         * get contract method with method name
+         * @param { Object } contract 
+         * @param { String } methodName 
+         */
+
+    }, {
+        key: '_getContractMethod',
+        value: function _getContractMethod(contract, methodName) {
+            var method = {};
+            for (var i = 0; i < contract.abi.length; i++) {
+                var abi = contract.abi[i];
+
+                if (abi.name == methodName) {
+
+                    method = {
+                        name: abi.name,
+                        constant: abi.constant
+                    };
+
+                    if (abi.inputs && abi.inputs.length > 0) {
+                        method.types = [];
+                        method.returns = [];
+                        for (var j = 0; j < abi.inputs.length; j++) {
+                            method.types.push(abi.inputs[j].type);
+                        }
+                        for (var k = 0; k < abi.outputs.length; k++) {
+                            method.returns.push(abi.outputs[k].type);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            return method;
+        }
+
+        /**
+         * encode ABI with contract
+         * @param { Object } contractMethod 
+         * @param { Array } args 
+         */
+
     }, {
         key: '_encodeAbi',
-        value: function _encodeAbi() {}
+        value: function _encodeAbi(contractMethod, args) {
+            var methodId = Abi.methodID(contractMethod.name, contractMethod.types);
+            var encoded = Abi.rawEncode(contractMethod.types, args);
+
+            return '0x' + methodId.toString('hex') + encoded.toString('hex');
+        }
+
+        /**
+         * decode ABI with contract
+         * @param { Object } contractMethod
+         * @param { String } data 
+         */
+
+    }, {
+        key: '_decodeAbi',
+        value: function _decodeAbi(contractMethod, data) {
+            var decoded = data;
+
+            if (contractMethod) {
+                decoded = Abi.rawDecode(contractMethod.returns, EthUtil.toBuffer(data));
+                decoded = decoded.toString('hex');
+            }
+
+            return decoded;
+        }
+
+        /**
+         * sigin transaction with private key
+         * @param { Object } transactionObject 
+         * @param { String } privateKey 
+         */
+
     }, {
         key: '_signTx',
-        value: function _signTx() {}
+        value: function _signTx(transactionObject, privateKey) {
+            var tx = new Transaction(transactionObject);
+            var pk = EthUtil.toBuffer(privateKey);
+            tx.sign(pk);
+            var serialize = tx.serialize();
+
+            return serialize ? '0x' + serialize.toString('hex') : '';
+        }
     }, {
-        key: 'test',
-        value: function test() {
+        key: '_test',
+        value: function _test() {
 
             console.log(web3.eth.accounts);
             console.log(web3.eth.defaultBlock);
