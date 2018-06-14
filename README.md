@@ -31,35 +31,41 @@ wallet.getBalance(wallet.address).then(res => {
 
 ## API
 
-### Attributes
-* privateKey
-* publicKey
-* address
-* currency
-* transactionObject
-    * [contract]
-    * [methodName]
-    * [arguments]
-    * [privateKey]
-    * from
-    * [to]
-    * [value]
-    * [gas]
-    * [gasPrice]
-    * [data]
-    * [none]
+### wallet
+* Attributes
+    * privateKey
+    * publicKey
+    * address
+    * currency
+    * transactionObject
+        * [contract]
+        * [methodName]
+        * [arguments]
+        * [privateKey]
+        * from
+        * [to]
+        * [value]
+        * [gas]
+        * [gasPrice]
+        * [data]
+        * [none]
+* Methods
+    * generate([currency]): Object
+    * import(key [, type] [, currency]): Object
+        * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
+        * key: string
+        * currency: string
+    * setProvider(host)
+    * getBalance(addressHexString): Promise
+    * getTokenBalance(addressHexString, contractAddress): Promise
+    * getTransaction(transactionHash): Promise
+    * contract(abi, address): Object
+    * sendTransaction(transactionObject): Promise
 
-### Methods
-* generate([currency]): Object
-* import(key [, type] [, currency]): Object
-    * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
-    * key: string
-    * currency: string
-* setProvider(host)
-* getBalance(addressHexString): Promise
-* getTokenBalance(addressHexString, contractAddress): Promise
-* getTransaction(transactionHash): Promise
-* contract(abi, address): Object
-* sendTransaction(transactionObject): Promise
+### eth-util
 * toWei(num, unit)
 * fromWei(num, unit)
+* toBuffer
+* decodeAbi
+* encodeAbi
+* signTransaction

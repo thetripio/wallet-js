@@ -71,6 +71,7 @@ describe('transaction', () => {
             //data: '',
             nonce: null
         });
+        console.log('tx');
         console.log(tx);
 
     }, 30000);

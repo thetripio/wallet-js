@@ -1,9 +1,7 @@
 import Wallet from 'ethereumjs-wallet';
-import EthUtil from 'ethereumjs-util';
-import Abi from 'ethereumjs-abi';
-import Transaction from 'ethereumjs-tx';
 import Web3 from 'web3';
-import eip20 from './eth-eip-20';
+import Util from './eth-util';
+import Eip20 from './eth-eip-20';
 
 let web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'));
 
@@ -34,7 +32,7 @@ export default class EthWallet {
      * @param { String } type : 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
      */
     import(key, type) {
-        var priv = EthUtil.toBuffer(key);
+        var priv = Util.toBuffer(key);
         this._importPrivateKey(priv)
     }
 
@@ -53,14 +51,6 @@ export default class EthWallet {
      */
     setProvider(host, timeout) {
         web3.setProvider(new Web3.providers.HttpProvider(host, timeout));
-    }
-
-    toWei(num, unit) {
-        return web3.toWei(num, unit);
-    }
-
-    fromWei(num, unit) {
-        return web3.fromWei(num, unit)
     }
 
     /**
@@ -82,20 +72,13 @@ export default class EthWallet {
     }
 
     /**
-     * 
-     */
-    getTrio() {
-        
-    }
-
-    /**
      * get token balance
      * @param { String } addressHexString 
      * @param { String } tokenAddress
      * @return { Promise }
      */
     getTokenBalance(addressHexString, tokenAddress) {
-        let contract = web3.eth.contract(eip20);
+        let contract = web3.eth.contract(Eip20);
         let contractInstance = contract.at(tokenAddress);
 
         return new Promise((resolve, reject) => {
@@ -194,7 +177,7 @@ export default class EthWallet {
      */
     sendTransaction(transactionObject) {
         if (!transactionObject.nonce && transactionObject.nonce !== 0) {
-            return this._getTransactionCount(transactionObject.from).then(res => {
+            return this.getTransactionCount(transactionObject.from).then(res => {
                 transactionObject.nonce = res;
                 return this._sendTransaction(transactionObject);
             });
@@ -218,7 +201,7 @@ export default class EthWallet {
                 value: transactionObject.value,
                 gasLimit: transactionObject.gasLimit,
                 gasPrice: transactionObject.gasPrice,
-                data: this._encodeAbi(contractMethod, transactionObject.arguments),
+                data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
                 nonce: transactionObject.nonce
             };
         }
@@ -238,7 +221,7 @@ export default class EthWallet {
 
         return new Promise((resolve, reject) => {
             if (needSign) {
-                let serialize = this._signTx(txObj, transactionObject.privateKey);
+                let serialize = Util.signTransaction(txObj, transactionObject.privateKey);
 
                 web3.eth.sendRawTransaction(serialize, (err, res) => {
                     if (err) {
@@ -255,7 +238,7 @@ export default class EthWallet {
                         reject(err);
                     }
                     else {
-                        resolve(this._decodeAbi(contractMethod, res));
+                        resolve(Util.decodeAbi(contractMethod.returns, res));
                     }
                 });
             }
@@ -263,7 +246,7 @@ export default class EthWallet {
 
     }
 
-    _getTransactionCount(address) {
+    getTransactionCount(address) {
         return new Promise((resolve, reject) => {
             web3.eth.getTransactionCount(address, (err, res) => {
                 if (err) {
@@ -309,48 +292,6 @@ export default class EthWallet {
         }
 
         return method;
-    }
-
-    /**
-     * encode ABI with contract
-     * @param { Object } contractMethod 
-     * @param { Array } args 
-     */
-    _encodeAbi(contractMethod, args) {
-        let methodId = Abi.methodID(contractMethod.name, contractMethod.types);
-        let encoded = Abi.rawEncode(contractMethod.types, args);
-
-        return '0x' + methodId.toString('hex') + encoded.toString('hex');
-    }
-
-    /**
-     * decode ABI with contract
-     * @param { Object } contractMethod
-     * @param { String } data 
-     */
-    _decodeAbi(contractMethod, data) {
-        let decoded = data;
-
-        if (contractMethod) {
-            decoded = Abi.rawDecode(contractMethod.returns, EthUtil.toBuffer(data));
-            decoded = decoded.toString('hex');
-        }
-
-        return decoded;
-    }
-
-    /**
-     * sigin transaction with private key
-     * @param { Object } transactionObject 
-     * @param { String } privateKey 
-     */
-    _signTx(transactionObject, privateKey) {
-        let tx = new Transaction(transactionObject);
-        let pk = EthUtil.toBuffer(privateKey)
-        tx.sign(pk);
-        let serialize = tx.serialize();
-
-        return serialize ? ('0x' + serialize.toString('hex')) : '';
     }
 
     _test() {
