@@ -246,6 +246,44 @@ export default class EthWallet {
 
     }
 
+    transaction(transactionObject) {
+        let txObj = {}, needSign = false, contractMethod;
+
+        if (transactionObject.contract) {
+            contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
+
+            needSign = !contractMethod.constant;
+
+            txObj = {
+                from: transactionObject.from,
+                to: transactionObject.contract.address || transactionObject.to,
+                value: transactionObject.value,
+                gasLimit: transactionObject.gasLimit,
+                gasPrice: transactionObject.gasPrice,
+                data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
+                nonce: transactionObject.nonce
+            };
+        }
+        else {
+            needSign = true;
+
+            txObj = {
+                from: transactionObject.from,
+                to: transactionObject.to,
+                value: transactionObject.value,
+                gasLimit: transactionObject.gasLimit,
+                gasPrice: transactionObject.gasPrice,
+                data: transactionObject.data || '0x',
+                nonce: transactionObject.nonce
+            };
+        }
+
+        return {
+            instance: txObj,
+            needSign: needSign
+        };
+    }
+
     getTransactionCount(address) {
         return new Promise((resolve, reject) => {
             web3.eth.getTransactionCount(address, (err, res) => {

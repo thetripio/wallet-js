@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import EthUtil from 'ethereumjs-util';
 import Transaction from 'ethereumjs-tx';
 import Abi from 'ethereumjs-abi';
+import Secp256k1 from 'secp256k1';
 
 let web3 = new Web3();
 
@@ -15,6 +16,9 @@ export default {
     },
     fromWei: (num, unit) => {
         return web3.fromWei(num, unit);
+    },
+    toBigNumber: (value) => {
+        return web3.toBigNumber(value);
     },
     toBuffer: (any) => {
         return EthUtil.toBuffer(any);
@@ -59,5 +63,10 @@ export default {
         let serialize = tx.serialize().toString('hex');
 
         return '0x' + serialize;
+    },
+    verifyPrivateKey: (privateKey) => {
+        let pk = EthUtil.toBuffer(privateKey);
+
+        return pk.length == 32 && Secp256k1.privateKeyVerify(pk)
     }
 }

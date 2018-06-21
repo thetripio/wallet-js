@@ -45,7 +45,7 @@ wallet.getBalance(wallet.address).then(res => {
         * from
         * [to]
         * [value]
-        * [gas]
+        * [gasLimit]
         * [gasPrice]
         * [data]
         * [none]
