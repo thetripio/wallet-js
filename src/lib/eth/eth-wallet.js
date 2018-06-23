@@ -332,6 +332,8 @@ export default class EthWallet {
         return method;
     }
 
+    
+
     _test() {
 
         console.log(web3.eth.accounts);

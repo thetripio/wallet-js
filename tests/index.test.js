@@ -1,4 +1,4 @@
-import Wallet from '../src/index';
+import Wallet, {EthUtil} from "../src/index";
 
 describe('create wallet', () => {
     
@@ -6,6 +6,7 @@ describe('create wallet', () => {
 
     test('generate wallet', () => {
         expect('eth').toBe(wallet.currency);
+        console.log(EthUtil.toWei('11'));
     });
 
 });

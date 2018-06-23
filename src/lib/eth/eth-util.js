@@ -23,9 +23,15 @@ export default {
     toBuffer: (any) => {
         return EthUtil.toBuffer(any);
     },
-    fromBuffer: () => {
-
+    toHex: (any) => {
+        return web3.toHex(any);
     },
+    verifyPrivateKey: (privateKey) => {
+        let pk = EthUtil.toBuffer(privateKey);
+
+        return pk.length == 32 && Secp256k1.privateKeyVerify(pk)
+    },
+    
     /**
      * decode ABI with contract
      * @param { Array } types
@@ -63,10 +69,5 @@ export default {
         let serialize = tx.serialize().toString('hex');
 
         return '0x' + serialize;
-    },
-    verifyPrivateKey: (privateKey) => {
-        let pk = EthUtil.toBuffer(privateKey);
-
-        return pk.length == 32 && Secp256k1.privateKeyVerify(pk)
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "trip-wallet",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "description": "Trip wallet SDK for JavaScript",
     "authors": [
         {
@@ -30,9 +30,9 @@
         "web3": "0.19.0"
     },
     "scripts": {
-        "test": "NODE_ENV=dev jest",
-        "coverage": "NODE_ENV=dev jest --coverage",
-        "build": "NODE_ENV=prod rollup -c"
+        "test": "BABEL_ENV=test jest",
+        "coverage": "BABEL_ENV=test jest --coverage",
+        "build": "BABEL_NV=build rollup -c"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",
