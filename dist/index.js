@@ -531,6 +531,18 @@ class EthWallet {
         return method;
     }
 
+    gasPrice() {
+        return new Promise((resolve, reject) => {
+            web3$1.eth.getGasPrice((err, res) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(res);
+                }
+            });
+        });
+    }
+
     _test() {
 
         console.log(web3$1.eth.accounts);
