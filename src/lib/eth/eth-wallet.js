@@ -332,7 +332,18 @@ export default class EthWallet {
         return method;
     }
 
-    
+    gasPrice() {
+        return new Promise((resolve, reject) => {
+            web3.eth.getGasPrice((err, res) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(res);
+                }
+            });
+        });
+    }
 
     _test() {
 
