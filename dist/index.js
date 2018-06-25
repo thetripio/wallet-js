@@ -364,7 +364,12 @@ class EthWallet {
      */
     estimateGas(transactionObject) {
         return new Promise((resolve, reject) => {
-            web3$1.eth.estimateGas(transactionObject, (err, res) => {
+            let txObj = this._createTransaction(transactionObject);
+            delete txObj._contractMethod;
+
+            console.log(txObj);
+
+            web3$1.eth.estimateGas(txObj, (err, res) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -390,39 +395,17 @@ class EthWallet {
     }
 
     _sendTransaction(transactionObject) {
-        let txObj = {},
-            needSign = false,
-            contractMethod;
+        let txObj = this._createTransaction(transactionObject);
+        let contractMethod = txObj._contractMethod;
+        let needSign = true;
 
-        if (transactionObject.contract) {
-            contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
-
-            needSign = !contractMethod.constant;
-
-            txObj = {
-                from: transactionObject.from,
-                to: transactionObject.contract.address || transactionObject.to,
-                value: transactionObject.value,
-                gasLimit: transactionObject.gasLimit,
-                gasPrice: transactionObject.gasPrice,
-                data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
-                nonce: transactionObject.nonce
-            };
-        } else {
-            needSign = true;
-
-            txObj = {
-                from: transactionObject.from,
-                to: transactionObject.to,
-                value: transactionObject.value,
-                gasLimit: transactionObject.gasLimit,
-                gasPrice: transactionObject.gasPrice,
-                data: transactionObject.data || '0x',
-                nonce: transactionObject.nonce
-            };
+        if (txObj._contractMethod) {
+            needSign = !txObj._contractMethod.constant;
         }
 
         return new Promise((resolve, reject) => {
+            delete txObj._contractMethod;
+
             if (needSign) {
                 let serialize = Util.signTransaction(txObj, transactionObject.privateKey);
 
@@ -445,15 +428,11 @@ class EthWallet {
         });
     }
 
-    transaction(transactionObject) {
-        let txObj = {},
-            needSign = false,
-            contractMethod;
+    _createTransaction(transactionObject) {
+        let txObj = {};
 
         if (transactionObject.contract) {
-            contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
-
-            needSign = !contractMethod.constant;
+            let contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
 
             txObj = {
                 from: transactionObject.from,
@@ -462,10 +441,10 @@ class EthWallet {
                 gasLimit: transactionObject.gasLimit,
                 gasPrice: transactionObject.gasPrice,
                 data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
-                nonce: transactionObject.nonce
+                nonce: transactionObject.nonce,
+                _contractMethod: contractMethod
             };
         } else {
-            needSign = true;
 
             txObj = {
                 from: transactionObject.from,
@@ -478,10 +457,7 @@ class EthWallet {
             };
         }
 
-        return {
-            instance: txObj,
-            needSign: needSign
-        };
+        return txObj;
     }
 
     getTransactionCount(address) {
@@ -531,6 +507,9 @@ class EthWallet {
         return method;
     }
 
+    /**
+     * get gas price
+     */
     gasPrice() {
         return new Promise((resolve, reject) => {
             web3$1.eth.getGasPrice((err, res) => {

@@ -2,6 +2,7 @@ import EthWallet from '../src/lib/eth/eth-wallet';
 import ethUtil from 'ethereumjs-util';
 import secp256k1 from 'secp256k1';
 import eip20 from '../src/lib/eth/eth-eip-20';
+import roomnight from './abis/tripio-roomnight';
 
 const wallet = new EthWallet();
 wallet.setProvider('http://192.168.1.41:8545', 1000);
@@ -78,15 +79,25 @@ describe('transaction', () => {
 
     test('estimateGas', async () => {
 
+        let contract = wallet.contract(roomnight, '0x286dafcbaa3f470f02bbbe6cb1463e952c8644d3');
+
+        // let gas = await wallet.estimateGas({
+
+        //     from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
+        //     contract: contract,
+        //     methodName: 'updatePrices',
+        //     //gasPrice: 1,
+        //     arguments: ['0', ['20181002'], '1', ['1'], ['2001']],
+        //     gasPrice: 100000000,
+        //     //data: '',
+        //     //nonce: 12
+        // });
         let gas = await wallet.estimateGas({
             from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-            to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
-            value: 1000000000000000000,
-            gasLimit: 22000,
-            gasPrice: 1000000000,
+            //to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+            //value: 1000000000000000000,
             //data: '',
-            //nonce: 12,
-            privateKey: '0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65'
+            //nonce: 12
         });
 
         console.log('Gas Limit', gas);

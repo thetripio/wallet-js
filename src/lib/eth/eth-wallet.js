@@ -162,7 +162,7 @@ export default class EthWallet {
         return new Promise((resolve, reject) => {
             let txObj = this._createTransaction(transactionObject);
             delete txObj._contractMethod;
-            
+
             web3.eth.estimateGas(txObj, (err, res) => {
                 if (err) {
                     reject(err);
