@@ -76,6 +76,22 @@ describe('transaction', () => {
 
     }, 30000);
 
+    test('estimateGas', async () => {
+
+        let gas = await wallet.estimateGas({
+            from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
+            to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+            value: 1000000000000000000,
+            gasLimit: 22000,
+            gasPrice: 1000000000,
+            //data: '',
+            //nonce: 12,
+            privateKey: '0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65'
+        });
+
+        console.log('Gas Limit', gas);
+    });
+
     // test('sendTransaction', async () => {
         
     //     let tx = await wallet.sendTransaction({
