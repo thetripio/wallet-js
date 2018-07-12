@@ -16,7 +16,6 @@ export default class EthWallet {
 
     /**
      * generate wallet
-     * @return 
      */
     generate() {
         var wallet = Wallet.generate();
@@ -157,6 +156,7 @@ export default class EthWallet {
     /**
      * get trasaction gasLimit
      * @param { Object } transactionObject 
+     * @return { Promise }
      */
     estimateGas(transactionObject) {
         return new Promise((resolve, reject) => {
@@ -177,6 +177,7 @@ export default class EthWallet {
     /**
      * send transaction
      * @param { Object } transactionObject
+     * @return { Promise }
      */
     sendTransaction(transactionObject) {
         if (!transactionObject.nonce && transactionObject.nonce !== 0) {
@@ -311,6 +312,7 @@ export default class EthWallet {
 
     /**
      * get gas price
+     * @return { Promise }
      */
     gasPrice() {
         return new Promise((resolve, reject) => {
@@ -324,28 +326,4 @@ export default class EthWallet {
             });
         });
     }
-
-    _test() {
-
-        console.log(web3.eth.accounts);
-        console.log(web3.eth.defaultBlock);
-        console.log(web3.eth.blockNumber);
-        console.log(web3.eth.getBlock(50601));
-
-        
-
-        // console.log(web3.eth.getTransactionCount(web3.eth.accounts[0]));
-
-        // var transaction = web3.eth.getTransactionFromBlock('latest', 0);
-        // console.log(transaction);
-
-        // let filter = web3.eth.filter({
-        //     address: '0xb02d5da39628918daa9545388f1abb60be368e0a'
-        // });
-
-        // filter.get((err, log) => {
-        //     console.log(log);
-        // });
-    }
-
 }

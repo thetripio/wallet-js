@@ -39,12 +39,12 @@ wallet.getBalance(wallet.address).then(res => {
     * currency
     * transactionObject
         * [contract]
-        * [methodName]
-        * [arguments]
-        * [privateKey]
-        * from
-        * [to]
-        * [value]
+        * [methodName]: String
+        * [arguments]: Array
+        * [privateKey]: String
+        * from: String
+        * [to]: String
+        * [value]: 
         * [gasLimit]
         * [gasPrice]
         * [data]
@@ -60,12 +60,17 @@ wallet.getBalance(wallet.address).then(res => {
     * getTokenBalance(addressHexString, contractAddress): Promise
     * getTransaction(transactionHash): Promise
     * contract(abi, address): Object
+    * estimateGas(transactionObject): Promise
+    * gasPrice(): Promise
     * sendTransaction(transactionObject): Promise
 
 ### eth-util
 * toWei(num, unit)
 * fromWei(num, unit)
+* toBigNumber
 * toBuffer
+* toHex
+* verifyPrivateKey
 * decodeAbi
 * encodeAbi
 * signTransaction

@@ -11,7 +11,6 @@ wallet.setProvider('http://192.168.1.41:8545', 1000);
 
 describe('generate wallet', () => {
     wallet.generate();
-    console.log(wallet);
     let privateKeyBuffer = ethUtil.toBuffer(wallet.privateKey);
 
     test('privateKey must be 32bit', () => {
@@ -39,21 +38,22 @@ describe('transaction', () => {
     test('getBalance', async () => {
         let balance = await wallet.getBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3');
 
-        console.log(balance.toNumber());
+        console.log('balance:', balance.toNumber());
+        expect(balance.toNumber()).not.toBe(0);
        
     }, 30000);
 
     test('getTokenBalance', async () => {
-        let balance = await wallet.getTokenBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3', '0xF142f1c7BaDc95FB438302D7Cf0a5Db426f8f779');
+        let balance = await wallet.getTokenBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3', '0xd68c8a6efec16180f4989dfb683d48dfd2b0ed7d');
 
-        console.log(balance.toNumber());
-
+        console.log('token:', balance.toNumber());
+        expect(balance.toNumber()).not.toBe(0);
     }, 30000);
 
     test('getTransaction', async () => {
         let tx = await wallet.getTransaction('0x15bedb614812a187fa0128e7473d64c106f8c9dc1e71fbb72422df4fc49840b4')
 
-        console.log(tx);
+        expect('0x15bedb614812a187fa0128e7473d64c106f8c9dc1e71fbb72422df4fc49840b4').toBe(tx.hash);
     }, 30000);
 
     test('sendTransaction contract', async () => {
@@ -72,35 +72,27 @@ describe('transaction', () => {
             //data: '',
             nonce: null
         });
-        console.log('tx');
-        console.log(tx);
+        
+        console.log('balanceOf:', tx);
+        expect(tx).not.toBe(0);
 
     }, 30000);
 
     test('estimateGas', async () => {
-
-        let contract = wallet.contract(roomnight, '0x286dafcbaa3f470f02bbbe6cb1463e952c8644d3');
-
-        // let gas = await wallet.estimateGas({
-
-        //     from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-        //     contract: contract,
-        //     methodName: 'updatePrices',
-        //     //gasPrice: 1,
-        //     arguments: ['0', ['20181002'], '1', ['1'], ['2001']],
-        //     gasPrice: 100000000,
-        //     //data: '',
-        //     //nonce: 12
-        // });
         let gas = await wallet.estimateGas({
             from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-            //to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
-            //value: 1000000000000000000,
-            //data: '',
-            //nonce: 12
+            to: '0xb02d5da39628918daa9545388f1abb60be368e0a'
         });
 
-        console.log('Gas Limit', gas);
+        console.log('Gas Limit:', gas);
+        expect(gas).toBe(21000);
+    });
+
+    test('gasPrice', async () => {
+        let gasPrice = await wallet.gasPrice();
+
+        console.log('Gas Price:', gasPrice.toString());
+        expect(gasPrice).not.toBe(0);
     });
 
     // test('sendTransaction', async () => {
@@ -120,29 +112,4 @@ describe('transaction', () => {
     // });
 
  });
-
-// describe('main transaction', () => {
-//      wallet.setProvider('https://mainnet.infura.io/9WfBzi6QFGrAWBYZKq57');
-//     //wallet.setProvider('http://35.200.87.13:8545');
-
-//     test('getBalance', async () => {
-//         let balance = await wallet.getBalance('0xb02d5da39628918daa9545388f1abb60be368e0a');
-
-//         console.log(balance.toNumber());
-//     }, 10000);
-
-//     test('getTokenBalance', async () => {
-//         let balance = await wallet.getTokenBalance('0xb02d5da39628918daa9545388f1abb60be368e0a', '0x8b40761142b9aa6dc8964e61d0585995425c3d94')
-
-//         console.log(balance.toNumber());
-//     }, 10000);
-
-//     test('getTransaction', async () => {
-//         let tx = await wallet.getTransaction('0xec3caf5731d6b9724ff5278bd9482bfeb58e3d1f44b199c7ce99b4e07def83cf');
-
-//         expect('0xec3caf5731d6b9724ff5278bd9482bfeb58e3d1f44b199c7ce99b4e07def83cf').toBe(tx.hash);
-//         expect('0xb02d5da39628918daa9545388f1abb60be368e0a').toBe(tx.from);
-//     }, 10000);
-    
-// });
 
