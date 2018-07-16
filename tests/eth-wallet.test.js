@@ -9,18 +9,18 @@ wallet.setProvider('http://192.168.1.41:8545', 1000);
 // wallet.setProvider('https://rinkeby.infura.io', 1000);
 // http://35.200.87.13:8545
 
-describe('generate wallet', () => {
-    wallet.generate();
-    let privateKeyBuffer = ethUtil.toBuffer(wallet.privateKey);
+// describe('generate wallet', () => {
+//     wallet.generate();
+//     let privateKeyBuffer = ethUtil.toBuffer(wallet.privateKey);
 
-    test('privateKey must be 32bit', () => {
-        expect(32).toBe(privateKeyBuffer.length);
-    });
+//     test('privateKey must be 32bit', () => {
+//         expect(32).toBe(privateKeyBuffer.length);
+//     });
 
-    test('verify privateKey', () => {
-        expect(true).toBe(secp256k1.privateKeyVerify(privateKeyBuffer));
-    });
-});
+//     test('verify privateKey', () => {
+//         expect(true).toBe(secp256k1.privateKeyVerify(privateKeyBuffer));
+//     });
+// });
 
 describe('import wallet', () => {
     wallet.import('0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65')
