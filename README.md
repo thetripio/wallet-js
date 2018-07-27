@@ -33,28 +33,28 @@ wallet.getBalance(wallet.address).then(res => {
 
 ### wallet
 * Attributes
-    * privateKey
-    * publicKey
-    * address
-    * currency
+    * privateKey: String (hex string)
+    * publicKey: String (hex string)
+    * address: String (hex string)
+    * currency: String
     * transactionObject
-        * [contract]
-        * [methodName]: String
-        * [arguments]: Array
-        * [privateKey]: String
-        * from: String
-        * [to]: String
-        * [value]: 
-        * [gasLimit]
-        * [gasPrice]
-        * [data]
-        * [none]
+        * contract: Object
+        * methodName: String
+        * arguments: Array[]
+        * privateKey: String (hex string)
+        * from: String (hex string)
+        * to: String (hex string)
+        * value: Number | String | BigNumber
+        * gasLimit: Number | String | BigNumber
+        * gasPrice: Number | String | BigNumber
+        * data: String
+        * none: Number
 * Methods
     * generate([currency]): Object
     * import(key [, type] [, currency]): Object
         * type: 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
-        * key: string
-        * currency: string
+        * key: String
+        * currency: String
     * setProvider(host)
     * getBalance(addressHexString): Promise
     * getTokenBalance(addressHexString, contractAddress): Promise
