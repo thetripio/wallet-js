@@ -450,9 +450,6 @@ class EthWallet {
                     if (err) {
                         reject(err);
                     } else {
-                        console.log('_sendTransaction');
-                        console.log(contractMethod.returns);
-                        console.log(res);
                         resolve(Util.decodeAbi(contractMethod.returns, res));
                     }
                 });
