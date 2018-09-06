@@ -250,6 +250,7 @@ let web3$1 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'
 class EthWallet {
     constructor() {
         this.currency = 'eth';
+        this.web3 = web3$1;
     }
 
     /**
