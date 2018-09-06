@@ -23,6 +23,7 @@ export default class EthWallet {
         this.privateKey = wallet.getPrivateKeyString();
         this.publicKey = wallet.getPublicKeyString();
         this.address = wallet.getAddressString();
+        this.web3 = web3;
     }
 
     /**
