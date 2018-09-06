@@ -1,6 +1,6 @@
 {
     "name": "trip-wallet",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "description": "Trip wallet SDK for JavaScript",
     "authors": [
         {

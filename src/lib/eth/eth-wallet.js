@@ -12,6 +12,7 @@ let web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'))
 export default class EthWallet {
     constructor() {
         this.currency = 'eth';
+        this.web3 = web3;
     }
 
     /**
@@ -23,7 +24,6 @@ export default class EthWallet {
         this.privateKey = wallet.getPrivateKeyString();
         this.publicKey = wallet.getPublicKeyString();
         this.address = wallet.getAddressString();
-        this.web3 = web3;
     }
 
     /**
