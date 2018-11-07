@@ -32,7 +32,7 @@
     "scripts": {
         "test": "BABEL_ENV=test jest",
         "coverage": "BABEL_ENV=test jest --coverage",
-        "build": "BABEL_NV=build rollup -c",
+        "build": "BABEL_ENV=build rollup -c",
         "deploy": "yarn build && yarn publish"
     },
     "devDependencies": {
