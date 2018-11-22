@@ -11,7 +11,7 @@ var Abi = _interopDefault(require('ethereumjs-abi'));
 var Secp256k1 = _interopDefault(require('secp256k1'));
 var Wallet = _interopDefault(require('ethereumjs-wallet'));
 
-let web3 = new Web3();
+var web3 = new Web3();
 
 /**
  * EthUtil
@@ -24,7 +24,7 @@ var Util = {
    * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
    * @returns { String|BigNumber }
    */
-  toWei: (num, unit) => {
+  toWei: function toWei(num, unit) {
     return web3.toWei(num, unit);
   },
   /**
@@ -33,7 +33,7 @@ var Util = {
    * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
    * @returns { String|BigNumber }
    */
-  fromWei: (num, unit) => {
+  fromWei: function fromWei(num, unit) {
     return web3.fromWei(num, unit);
   },
   /**
@@ -41,7 +41,7 @@ var Util = {
    * @param { String | Number }
    * @returns { Object }
    */
-  toBigNumber: value => {
+  toBigNumber: function toBigNumber(value) {
     return web3.toBigNumber(value);
   },
   /**
@@ -49,23 +49,23 @@ var Util = {
    * @param { String }
    * @returns { Object }
    */
-  toBuffer: any => {
+  toBuffer: function toBuffer(any) {
     return EthUtil.toBuffer(any);
   },
   /**
    * convert string to hex
    */
-  toHex: any => {
+  toHex: function toHex(any) {
     return web3.toHex(any);
   },
-  fromHex: () => {},
+  fromHex: function fromHex() {},
   /**
    * verify private key
    * @param { String } privateKey
    * @returns { Boolean }
    */
-  verifyPrivateKey: privateKey => {
-    let pk = EthUtil.toBuffer(privateKey);
+  verifyPrivateKey: function verifyPrivateKey(privateKey) {
+    var pk = EthUtil.toBuffer(privateKey);
 
     return pk.length == 32 && Secp256k1.privateKeyVerify(pk);
   },
@@ -76,9 +76,9 @@ var Util = {
    * @param { Array } args
    * @return { String }
    */
-  encodeAbi: (methodName, types, args) => {
-    let methodId = Abi.methodID(methodName, types);
-    let encoded = Abi.rawEncode(types, args);
+  encodeAbi: function encodeAbi(methodName, types, args) {
+    var methodId = Abi.methodID(methodName, types);
+    var encoded = Abi.rawEncode(types, args);
 
     return '0x' + methodId.toString('hex') + encoded.toString('hex');
   },
@@ -88,8 +88,8 @@ var Util = {
    * @param { String } data
    * @return { String }
    */
-  decodeAbi: (types, data) => {
-    let decoded = Abi.rawDecode(types, EthUtil.toBuffer(data));
+  decodeAbi: function decodeAbi(types, data) {
+    var decoded = Abi.rawDecode(types, EthUtil.toBuffer(data));
 
     return decoded.toString('hex');
   },
@@ -99,11 +99,11 @@ var Util = {
    * @param { String } privateKey
    * @return { String }
    */
-  signTransaction: (transactionObject, privateKey) => {
-    let tx = new Transaction(transactionObject);
+  signTransaction: function signTransaction(transactionObject, privateKey) {
+    var tx = new Transaction(transactionObject);
     tx.sign(EthUtil.toBuffer(privateKey));
 
-    let serialize = tx.serialize().toString('hex');
+    var serialize = tx.serialize().toString('hex');
 
     return '0x' + serialize;
   }
@@ -241,14 +241,21 @@ var Eip20 = [{
     "type": "event"
 }];
 
-let web3$1 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'));
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var web3$1 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.41:8545'));
 
 /**
  * EthWallet
  * @class EthWallet
  */
-class EthWallet {
-    constructor() {
+
+var EthWallet = function () {
+    function EthWallet() {
+        _classCallCheck(this, EthWallet);
+
         this.currency = 'eth';
         this.web3 = web3$1;
     }
@@ -256,307 +263,355 @@ class EthWallet {
     /**
      * generate wallet
      */
-    generate() {
-        var wallet = Wallet.generate();
 
-        this.privateKey = wallet.getPrivateKeyString();
-        this.publicKey = wallet.getPublicKeyString();
-        this.address = wallet.getAddressString();
-    }
 
-    /**
-     * generate wallet from privatekey or keystore or mnemonicPhrase or publicKey
-     * @param { String } key 
-     * @param { String } type : 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
-     */
-    import(key, type) {
-        var priv = Util.toBuffer(key);
-        this._importPrivateKey(priv);
-    }
+    _createClass(EthWallet, [{
+        key: 'generate',
+        value: function generate() {
+            var wallet = Wallet.generate();
 
-    _importPrivateKey(priv) {
-        var wallet = Wallet.fromPrivateKey(priv);
-
-        this.privateKey = wallet.getPrivateKeyString();
-        this.publicKey = wallet.getPublicKeyString();
-        this.address = wallet.getAddressString();
-    }
-
-    /**
-     * set provider
-     * @param { String } host 
-     * @param { Number } timeout 
-     */
-    setProvider(host, timeout) {
-        web3$1.setProvider(new Web3.providers.HttpProvider(host, timeout));
-    }
-
-    /**
-     * get balance
-     * @param { String } addressHexString 
-     * @return { Promise }
-     */
-    getBalance(addressHexString) {
-        return new Promise((resolve, reject) => {
-            web3$1.eth.getBalance(addressHexString, (err, res) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
-    }
-
-    /**
-     * get token balance
-     * @param { String } addressHexString 
-     * @param { String } tokenAddress
-     * @return { Promise }
-     */
-    getTokenBalance(addressHexString, tokenAddress) {
-        let contract = web3$1.eth.contract(Eip20);
-        let contractInstance = contract.at(tokenAddress);
-
-        return new Promise((resolve, reject) => {
-            contractInstance.balanceOf(addressHexString, (err, res) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
-    }
-
-    /**
-     * get transaction
-     * @param { String } transactionHash 
-     * @return { Promise }
-     */
-    getTransaction(transactionHash) {
-
-        return new Promise((resolve, reject) => {
-            web3$1.eth.getTransaction(transactionHash, (txErr, txRes) => {
-
-                web3$1.eth.getTransactionReceipt(transactionHash, (recErr, recRes) => {
-                    if (txErr && recErr) {
-                        reject(txErr + recErr);
-                    } else {
-                        let tx = {};
-
-                        if (txRes && recRes) {
-                            tx = this._mergeTransaction(txRes, recRes);
-                        } else {
-                            tx = txRes || recRes;
-                        }
-
-                        resolve(tx);
-                    }
-                });
-            });
-        });
-    }
-
-    _mergeTransaction(transaction, receipt) {
-
-        let tx = {};
-
-        for (let key in transaction) {
-            tx[key] = transaction[key];
+            this.privateKey = wallet.getPrivateKeyString();
+            this.publicKey = wallet.getPublicKeyString();
+            this.address = wallet.getAddressString();
         }
 
-        for (let key in receipt) {
-            tx[key] = tx[key] || receipt[key];
+        /**
+         * generate wallet from privatekey or keystore or mnemonicPhrase or publicKey
+         * @param { String } key 
+         * @param { String } type : 'privateKey', 'keystore', 'mnemonicPhrase', 'readonly'
+         */
+
+    }, {
+        key: 'import',
+        value: function _import(key, type) {
+            var priv = Util.toBuffer(key);
+            this._importPrivateKey(priv);
+        }
+    }, {
+        key: '_importPrivateKey',
+        value: function _importPrivateKey(priv) {
+            var wallet = Wallet.fromPrivateKey(priv);
+
+            this.privateKey = wallet.getPrivateKeyString();
+            this.publicKey = wallet.getPublicKeyString();
+            this.address = wallet.getAddressString();
         }
 
-        return tx;
-    }
+        /**
+         * set provider
+         * @param { String } host 
+         * @param { Number } timeout 
+         */
 
-    getTransactions(addressHexString) {
-        console.log('please try https://etherscan.io/apis');
-        //http://api.etherscan.io/api?module=account&action=txlist&address=0xb02d5da39628918daa9545388f1abb60be368e0a
-    }
-
-    /**
-     * create contract instance
-     * @param { Array } abi 
-     * @param { String } address 
-     */
-    contract(abi, address) {
-        let contract = web3$1.eth.contract(abi);
-
-        return contract.at(address);
-    }
-    /**
-     * get trasaction gasLimit
-     * @param { Object } transactionObject 
-     * @return { Promise }
-     */
-    estimateGas(transactionObject) {
-        return new Promise((resolve, reject) => {
-            let txObj = this._createTransaction(transactionObject);
-            delete txObj._contractMethod;
-
-            web3$1.eth.estimateGas(txObj, (err, res) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
-    }
-
-    /**
-     * send transaction
-     * @param { Object } transactionObject
-     * @return { Promise }
-     */
-    sendTransaction(transactionObject) {
-        if (!transactionObject.nonce && transactionObject.nonce !== 0) {
-            return this.getTransactionCount(transactionObject.from).then(res => {
-                transactionObject.nonce = res;
-                return this._sendTransaction(transactionObject);
-            });
-        } else {
-            return this._sendTransaction(transactionObject);
-        }
-    }
-
-    _sendTransaction(transactionObject) {
-        let txObj = this._createTransaction(transactionObject);
-        let contractMethod = txObj._contractMethod;
-        let needSign = true;
-
-        if (txObj._contractMethod) {
-            needSign = !txObj._contractMethod.constant;
+    }, {
+        key: 'setProvider',
+        value: function setProvider(host, timeout) {
+            web3$1.setProvider(new Web3.providers.HttpProvider(host, timeout));
         }
 
-        return new Promise((resolve, reject) => {
-            delete txObj._contractMethod;
+        /**
+         * get balance
+         * @param { String } addressHexString 
+         * @return { Promise }
+         */
 
-            if (needSign) {
-                let serialize = Util.signTransaction(txObj, transactionObject.privateKey);
-
-                web3$1.eth.sendRawTransaction(serialize, (err, res) => {
+    }, {
+        key: 'getBalance',
+        value: function getBalance(addressHexString) {
+            return new Promise(function (resolve, reject) {
+                web3$1.eth.getBalance(addressHexString, function (err, res) {
                     if (err) {
                         reject(err);
                     } else {
                         resolve(res);
                     }
                 });
-            } else {
-                web3$1.eth.call(txObj, (err, res) => {
+            });
+        }
+
+        /**
+         * get token balance
+         * @param { String } addressHexString 
+         * @param { String } tokenAddress
+         * @return { Promise }
+         */
+
+    }, {
+        key: 'getTokenBalance',
+        value: function getTokenBalance(addressHexString, tokenAddress) {
+            var contract = web3$1.eth.contract(Eip20);
+            var contractInstance = contract.at(tokenAddress);
+
+            return new Promise(function (resolve, reject) {
+                contractInstance.balanceOf(addressHexString, function (err, res) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(Util.decodeAbi(contractMethod.returns, res));
+                        resolve(res);
                     }
                 });
-            }
-        });
-    }
-
-    _createTransaction(transactionObject) {
-        let txObj = {};
-
-        if (transactionObject.contract) {
-            let contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
-
-            txObj = {
-                from: transactionObject.from,
-                to: transactionObject.contract.address || transactionObject.to,
-                value: transactionObject.value,
-                gasLimit: transactionObject.gasLimit,
-                gasPrice: transactionObject.gasPrice,
-                data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
-                nonce: transactionObject.nonce,
-                _contractMethod: contractMethod
-            };
-        } else {
-
-            txObj = {
-                from: transactionObject.from,
-                to: transactionObject.to,
-                value: transactionObject.value,
-                gasLimit: transactionObject.gasLimit,
-                gasPrice: transactionObject.gasPrice,
-                data: transactionObject.data || '0x',
-                nonce: transactionObject.nonce
-            };
+            });
         }
 
-        return txObj;
-    }
+        /**
+         * get transaction
+         * @param { String } transactionHash 
+         * @return { Promise }
+         */
 
-    getTransactionCount(address) {
-        return new Promise((resolve, reject) => {
-            web3$1.eth.getTransactionCount(address, (err, res) => {
-                if (err) {
-                    reject(err);
+    }, {
+        key: 'getTransaction',
+        value: function getTransaction(transactionHash) {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                web3$1.eth.getTransaction(transactionHash, function (txErr, txRes) {
+
+                    web3$1.eth.getTransactionReceipt(transactionHash, function (recErr, recRes) {
+                        if (txErr && recErr) {
+                            reject(txErr + recErr);
+                        } else {
+                            var tx = {};
+
+                            if (txRes && recRes) {
+                                tx = _this._mergeTransaction(txRes, recRes);
+                            } else {
+                                tx = txRes || recRes;
+                            }
+
+                            resolve(tx);
+                        }
+                    });
+                });
+            });
+        }
+    }, {
+        key: '_mergeTransaction',
+        value: function _mergeTransaction(transaction, receipt) {
+
+            var tx = {};
+
+            for (var key in transaction) {
+                tx[key] = transaction[key];
+            }
+
+            for (var _key in receipt) {
+                tx[_key] = tx[_key] || receipt[_key];
+            }
+
+            return tx;
+        }
+    }, {
+        key: 'getTransactions',
+        value: function getTransactions(addressHexString) {
+            console.log('please try https://etherscan.io/apis');
+            //http://api.etherscan.io/api?module=account&action=txlist&address=0xb02d5da39628918daa9545388f1abb60be368e0a
+        }
+
+        /**
+         * create contract instance
+         * @param { Array } abi 
+         * @param { String } address 
+         */
+
+    }, {
+        key: 'contract',
+        value: function contract(abi, address) {
+            var contract = web3$1.eth.contract(abi);
+
+            return contract.at(address);
+        }
+        /**
+         * get trasaction gasLimit
+         * @param { Object } transactionObject 
+         * @return { Promise }
+         */
+
+    }, {
+        key: 'estimateGas',
+        value: function estimateGas(transactionObject) {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                var txObj = _this2._createTransaction(transactionObject);
+                delete txObj._contractMethod;
+
+                web3$1.eth.estimateGas(txObj, function (err, res) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+        }
+
+        /**
+         * send transaction
+         * @param { Object } transactionObject
+         * @return { Promise }
+         */
+
+    }, {
+        key: 'sendTransaction',
+        value: function sendTransaction(transactionObject) {
+            var _this3 = this;
+
+            if (!transactionObject.nonce && transactionObject.nonce !== 0) {
+                return this.getTransactionCount(transactionObject.from).then(function (res) {
+                    transactionObject.nonce = res;
+                    return _this3._sendTransaction(transactionObject);
+                });
+            } else {
+                return this._sendTransaction(transactionObject);
+            }
+        }
+    }, {
+        key: '_sendTransaction',
+        value: function _sendTransaction(transactionObject) {
+            var txObj = this._createTransaction(transactionObject);
+            var contractMethod = txObj._contractMethod;
+            var needSign = true;
+
+            if (txObj._contractMethod) {
+                needSign = !txObj._contractMethod.constant;
+            }
+
+            return new Promise(function (resolve, reject) {
+                delete txObj._contractMethod;
+
+                if (needSign) {
+                    var serialize = Util.signTransaction(txObj, transactionObject.privateKey);
+
+                    web3$1.eth.sendRawTransaction(serialize, function (err, res) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(res);
+                        }
+                    });
                 } else {
-                    resolve(res);
+                    web3$1.eth.call(txObj, function (err, res) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(res);
+                        }
+                    });
                 }
             });
-        });
-    }
+        }
+    }, {
+        key: '_createTransaction',
+        value: function _createTransaction(transactionObject) {
+            var txObj = {};
 
-    /**
-     * get contract method with method name
-     * @param { Object } contract 
-     * @param { String } methodName 
-     */
-    _getContractMethod(contract, methodName) {
-        let method = {};
-        for (let i = 0; i < contract.abi.length; i++) {
-            let abi = contract.abi[i];
+            if (transactionObject.contract) {
+                var contractMethod = this._getContractMethod(transactionObject.contract, transactionObject.methodName);
 
-            if (abi.name == methodName) {
-
-                method = {
-                    name: abi.name,
-                    constant: abi.constant
+                txObj = {
+                    from: transactionObject.from,
+                    to: transactionObject.contract.address || transactionObject.to,
+                    value: transactionObject.value,
+                    gasLimit: transactionObject.gasLimit,
+                    gasPrice: transactionObject.gasPrice,
+                    data: Util.encodeAbi(contractMethod.name, contractMethod.types, transactionObject.arguments),
+                    nonce: transactionObject.nonce,
+                    _contractMethod: contractMethod
                 };
+            } else {
 
-                if (abi.inputs && abi.inputs.length > 0) {
-                    method.types = [];
-                    method.returns = [];
-                    for (let j = 0; j < abi.inputs.length; j++) {
-                        method.types.push(abi.inputs[j].type);
-                    }
-                    for (let k = 0; k < abi.outputs.length; k++) {
-                        method.returns.push(abi.outputs[k].type);
-                    }
-                }
-
-                break;
+                txObj = {
+                    from: transactionObject.from,
+                    to: transactionObject.to,
+                    value: transactionObject.value,
+                    gasLimit: transactionObject.gasLimit,
+                    gasPrice: transactionObject.gasPrice,
+                    data: transactionObject.data || '0x',
+                    nonce: transactionObject.nonce
+                };
             }
+
+            return txObj;
+        }
+    }, {
+        key: 'getTransactionCount',
+        value: function getTransactionCount(address) {
+            return new Promise(function (resolve, reject) {
+                web3$1.eth.getTransactionCount(address, function (err, res) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
         }
 
-        return method;
-    }
+        /**
+         * get contract method with method name
+         * @param { Object } contract 
+         * @param { String } methodName 
+         */
 
-    /**
-     * get gas price
-     * @return { Promise }
-     */
-    gasPrice() {
-        return new Promise((resolve, reject) => {
-            web3$1.eth.getGasPrice((err, res) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(res);
+    }, {
+        key: '_getContractMethod',
+        value: function _getContractMethod(contract, methodName) {
+            var method = {};
+            for (var i = 0; i < contract.abi.length; i++) {
+                var abi = contract.abi[i];
+
+                if (abi.name == methodName) {
+
+                    method = {
+                        name: abi.name,
+                        constant: abi.constant
+                    };
+
+                    if (abi.inputs && abi.inputs.length > 0) {
+                        method.types = [];
+                        method.returns = [];
+                        for (var j = 0; j < abi.inputs.length; j++) {
+                            method.types.push(abi.inputs[j].type);
+                        }
+                        for (var k = 0; k < abi.outputs.length; k++) {
+                            method.returns.push(abi.outputs[k].type);
+                        }
+                    }
+
+                    break;
                 }
+            }
+
+            return method;
+        }
+
+        /**
+         * get gas price
+         * @return { Promise }
+         */
+
+    }, {
+        key: 'gasPrice',
+        value: function gasPrice() {
+            return new Promise(function (resolve, reject) {
+                web3$1.eth.getGasPrice(function (err, res) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
             });
-        });
-    }
-}
+        }
+    }]);
+
+    return EthWallet;
+}();
 
 //import BtcWallet from './lib/btc/btc-wallet';
 
-var index = (type => {
+var index = (function (type) {
     // TODO: use factory method create wallet
 
     return new EthWallet();

@@ -222,7 +222,7 @@ export default class EthWallet {
                         reject(err);
                     }
                     else {
-                        resolve(Util.decodeAbi(contractMethod.returns, res));
+                        resolve(res);
                     }
                 });
             }
