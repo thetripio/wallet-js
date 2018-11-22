@@ -83,8 +83,12 @@ export default {
      * @param { String } data
      * @return { String }
      */
-    decodeAbi: (types, data) => {
+    decodeAbi: (types, data, returnType) => {
         let decoded = Abi.rawDecode(types, EthUtil.toBuffer(data));
+
+        if(returnType == 'array') {
+            return decoded;
+        }
 
         return decoded.toString('hex');
     },

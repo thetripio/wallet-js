@@ -180,19 +180,19 @@ export default class EthWallet {
      * @param { Object } transactionObject
      * @return { Promise }
      */
-    sendTransaction(transactionObject) {
+    sendTransaction(transactionObject, returnType) {
         if (!transactionObject.nonce && transactionObject.nonce !== 0) {
             return this.getTransactionCount(transactionObject.from).then(res => {
                 transactionObject.nonce = res;
-                return this._sendTransaction(transactionObject);
+                return this._sendTransaction(transactionObject, returnType);
             });
         }
         else {
-            return this._sendTransaction(transactionObject);
+            return this._sendTransaction(transactionObject, returnType);
         }
     }
 
-    _sendTransaction(transactionObject) {
+    _sendTransaction(transactionObject, returnType) {
         let txObj = this._createTransaction(transactionObject);
         let contractMethod = txObj._contractMethod;
         let needSign = true;
@@ -222,7 +222,7 @@ export default class EthWallet {
                         reject(err);
                     }
                     else {
-                        resolve(res);
+                        resolve(Util.decodeAbi(contractMethod.returns, res, returnType));
                     }
                 });
             }

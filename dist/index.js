@@ -18,95 +18,99 @@ var web3 = new Web3();
  * @module EthUtil
  */
 var Util = {
-  /**
-   * convert unit to wei
-   * @param { Number | String | BigNumber }
-   * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
-   * @returns { String|BigNumber }
-   */
-  toWei: function toWei(num, unit) {
-    return web3.toWei(num, unit);
-  },
-  /**
-   * convert unit from wei
-   * @param { Number | String | BigNumber }
-   * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
-   * @returns { String|BigNumber }
-   */
-  fromWei: function fromWei(num, unit) {
-    return web3.fromWei(num, unit);
-  },
-  /**
-   * convert string or number to bigNumber
-   * @param { String | Number }
-   * @returns { Object }
-   */
-  toBigNumber: function toBigNumber(value) {
-    return web3.toBigNumber(value);
-  },
-  /**
-   * convert string to buffer
-   * @param { String }
-   * @returns { Object }
-   */
-  toBuffer: function toBuffer(any) {
-    return EthUtil.toBuffer(any);
-  },
-  /**
-   * convert string to hex
-   */
-  toHex: function toHex(any) {
-    return web3.toHex(any);
-  },
-  fromHex: function fromHex() {},
-  /**
-   * verify private key
-   * @param { String } privateKey
-   * @returns { Boolean }
-   */
-  verifyPrivateKey: function verifyPrivateKey(privateKey) {
-    var pk = EthUtil.toBuffer(privateKey);
+    /**
+     * convert unit to wei
+     * @param { Number | String | BigNumber }
+     * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
+     * @returns { String|BigNumber }
+     */
+    toWei: function toWei(num, unit) {
+        return web3.toWei(num, unit);
+    },
+    /**
+     * convert unit from wei
+     * @param { Number | String | BigNumber }
+     * @param { String } uint: tether|gether|mether|kether|ether|finney|szabo|gwei|mwei|kwei
+     * @returns { String|BigNumber }
+     */
+    fromWei: function fromWei(num, unit) {
+        return web3.fromWei(num, unit);
+    },
+    /**
+     * convert string or number to bigNumber
+     * @param { String | Number }
+     * @returns { Object }
+     */
+    toBigNumber: function toBigNumber(value) {
+        return web3.toBigNumber(value);
+    },
+    /**
+     * convert string to buffer
+     * @param { String }
+     * @returns { Object }
+     */
+    toBuffer: function toBuffer(any) {
+        return EthUtil.toBuffer(any);
+    },
+    /**
+     * convert string to hex
+     */
+    toHex: function toHex(any) {
+        return web3.toHex(any);
+    },
+    fromHex: function fromHex() {},
+    /**
+     * verify private key
+     * @param { String } privateKey
+     * @returns { Boolean }
+     */
+    verifyPrivateKey: function verifyPrivateKey(privateKey) {
+        var pk = EthUtil.toBuffer(privateKey);
 
-    return pk.length == 32 && Secp256k1.privateKeyVerify(pk);
-  },
-  /**
-   * encode ABI with contract
-   * @param { String } methodName
-   * @param { Array } types
-   * @param { Array } args
-   * @return { String }
-   */
-  encodeAbi: function encodeAbi(methodName, types, args) {
-    var methodId = Abi.methodID(methodName, types);
-    var encoded = Abi.rawEncode(types, args);
+        return pk.length == 32 && Secp256k1.privateKeyVerify(pk);
+    },
+    /**
+     * encode ABI with contract
+     * @param { String } methodName
+     * @param { Array } types
+     * @param { Array } args
+     * @return { String }
+     */
+    encodeAbi: function encodeAbi(methodName, types, args) {
+        var methodId = Abi.methodID(methodName, types);
+        var encoded = Abi.rawEncode(types, args);
 
-    return '0x' + methodId.toString('hex') + encoded.toString('hex');
-  },
-  /**
-   * decode ABI with contract
-   * @param { Array } types
-   * @param { String } data
-   * @return { String }
-   */
-  decodeAbi: function decodeAbi(types, data) {
-    var decoded = Abi.rawDecode(types, EthUtil.toBuffer(data));
+        return '0x' + methodId.toString('hex') + encoded.toString('hex');
+    },
+    /**
+     * decode ABI with contract
+     * @param { Array } types
+     * @param { String } data
+     * @return { String }
+     */
+    decodeAbi: function decodeAbi(types, data, returnType) {
+        var decoded = Abi.rawDecode(types, EthUtil.toBuffer(data));
 
-    return decoded.toString('hex');
-  },
-  /**
-   * 
-   * @param { Object } transactionObject
-   * @param { String } privateKey
-   * @return { String }
-   */
-  signTransaction: function signTransaction(transactionObject, privateKey) {
-    var tx = new Transaction(transactionObject);
-    tx.sign(EthUtil.toBuffer(privateKey));
+        if (returnType == 'array') {
+            return decoded;
+        }
 
-    var serialize = tx.serialize().toString('hex');
+        return decoded.toString('hex');
+    },
+    /**
+     * 
+     * @param { Object } transactionObject
+     * @param { String } privateKey
+     * @return { String }
+     */
+    signTransaction: function signTransaction(transactionObject, privateKey) {
+        var tx = new Transaction(transactionObject);
+        tx.sign(EthUtil.toBuffer(privateKey));
 
-    return '0x' + serialize;
-  }
+        var serialize = tx.serialize().toString('hex');
+
+        return '0x' + serialize;
+    }
 };
 
 var Eip20 = [{
@@ -454,21 +458,21 @@ var EthWallet = function () {
 
     }, {
         key: 'sendTransaction',
-        value: function sendTransaction(transactionObject) {
+        value: function sendTransaction(transactionObject, returnType) {
             var _this3 = this;
 
             if (!transactionObject.nonce && transactionObject.nonce !== 0) {
                 return this.getTransactionCount(transactionObject.from).then(function (res) {
                     transactionObject.nonce = res;
-                    return _this3._sendTransaction(transactionObject);
+                    return _this3._sendTransaction(transactionObject, returnType);
                 });
             } else {
-                return this._sendTransaction(transactionObject);
+                return this._sendTransaction(transactionObject, returnType);
             }
         }
     }, {
         key: '_sendTransaction',
-        value: function _sendTransaction(transactionObject) {
+        value: function _sendTransaction(transactionObject, returnType) {
             var txObj = this._createTransaction(transactionObject);
             var contractMethod = txObj._contractMethod;
             var needSign = true;
@@ -495,7 +499,7 @@ var EthWallet = function () {
                         if (err) {
                             reject(err);
                         } else {
-                            resolve(res);
+                            resolve(Util.decodeAbi(contractMethod.returns, res, returnType));
                         }
                     });
                 }
