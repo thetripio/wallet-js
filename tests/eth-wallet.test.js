@@ -23,20 +23,20 @@ wallet.setProvider('http://192.168.1.41:8545', 1000);
 // });
 
 describe('import wallet', () => {
-    wallet.import('0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65')
+    wallet.import('0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4')
 
     test('publicKey', () => {
         expect('0x246fa9a22eb6a99426c1255309a3e88aed5850294803c2e1df585a246d690d2153ba7b7d55616e953d3c7b60c686b2b418aa6de5fad5f1e1448ee1870cd67e6a').toBe(wallet.publicKey);
     });
 
     test('address', () => {
-        expect('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3').toBe(wallet.address);
+        expect(0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4').toBe(wallet.address);
     });
 });
 
 describe('transaction', () => {
     test('getBalance', async () => {
-        let balance = await wallet.getBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3');
+        let balance = await wallet.getBalance(0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4');
 
         console.log('balance:', balance.toNumber());
         expect(balance.toNumber()).not.toBe(0);
@@ -44,28 +44,28 @@ describe('transaction', () => {
     }, 30000);
 
     test('getTokenBalance', async () => {
-        let balance = await wallet.getTokenBalance('0x3228f93390612218a7d55503a3bdd46c4fbd1fd3', '0xd68c8a6efec16180f4989dfb683d48dfd2b0ed7d');
+        let balance = await wallet.getTokenBalance(0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4');
 
         console.log('token:', balance.toNumber());
         expect(balance.toNumber()).not.toBe(0);
     }, 30000);
 
     test('getTransaction', async () => {
-        let tx = await wallet.getTransaction('0x15bedb614812a187fa0128e7473d64c106f8c9dc1e71fbb72422df4fc49840b4')
+        let tx = await wallet.getTransaction(0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4')
 
-        expect('0x15bedb614812a187fa0128e7473d64c106f8c9dc1e71fbb72422df4fc49840b4').toBe(tx.hash);
+        expect(0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4').toBe(tx.hash);
     }, 30000);
 
     test('sendTransaction contract', async () => {
 
-        let contract = wallet.contract(eip20, '0xd68c8a6efec16180f4989dfb683d48dfd2b0ed7d');
+        let contract = wallet.contract(eip20, 0x45804880de22913dafe09f4980848ece6ecbaf78);
 
         let tx = await wallet.sendTransaction({
-            from: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+            from: '0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4,
             contract: contract,
             methodName: 'balanceOf',
-            arguments: ['0xb02d5da39628918daa9545388f1abb60be368e0a'],
-            //to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+            arguments: [0xb60e040596b4cfbc73723245047f93ae11bbe9fc86912c2d5b1f8c19b4cdb342'],
+            //to: '0x812cE2c4B8A2A2BF77B55ef096fa6269Dc8e3274,
             //value: 1, // unit wei
             //gas: 1,
             //gasPrice: 1,
@@ -80,8 +80,8 @@ describe('transaction', () => {
 
     test('estimateGas', async () => {
         let gas = await wallet.estimateGas({
-            from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-            to: '0xb02d5da39628918daa9545388f1abb60be368e0a'
+            from: ''0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4
+            to: '0x812cE2c4B8A2A2BF77B55ef096fa6269Dc8e3274
         });
 
         console.log('Gas Limit:', gas);
@@ -98,14 +98,14 @@ describe('transaction', () => {
     // test('sendTransaction', async () => {
         
     //     let tx = await wallet.sendTransaction({
-    //         from: '0x3228f93390612218a7d55503a3bdd46c4fbd1fd3',
-    //         to: '0xb02d5da39628918daa9545388f1abb60be368e0a',
+    //         from: '0xA12431D0B9dB640034b0CDFcEEF9CCe161e62be4,
+    //         to: 0x812cE2c4B8A2A2BF77B55ef096fa6269Dc8e3274',
     //         value: 1000000000000000000,
     //         gasLimit: 22000,
     //         gasPrice: 1000000000,
     //         //data: '',
     //         //nonce: 12,
-    //         privateKey: '0x229d31ddcf8f16d215dfa5b8e760b8775b7088a1311391e1ecbad251a9f2de65'
+    //         privateKey: ''
     //     });
 
     //     console.log(tx);
